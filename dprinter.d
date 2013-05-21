@@ -181,8 +181,9 @@ class DPrinter : Visitor
     override void visitImportDeclaration(ImportDeclaration ast)
     {
         return;
-        if (ast.fn == "assert.h")
+        /*if (ast.fn == "assert.h") { TODO(deadbeaf?)
             return;
+		}
         auto list =
         [
             "stdio.h" : "core.stdc.stdio",
@@ -203,8 +204,10 @@ class DPrinter : Visitor
             visitIdent(v[0].stripExtension());
             print("; // ");
             println(ast.fn);
-        } else
+        } else {
             assert(v[0].extension() == ".c");
+		}
+		*/
     }
 
     override void visitFuncDeclaration(FuncDeclaration ast)
@@ -684,7 +687,7 @@ class DPrinter : Visitor
         if (!ast.e)
         {
             assert(0);
-            write(ast.id);
+            //write(ast.id); TODO(dead code)
         }
         visit(ast.e);
         println("; }");

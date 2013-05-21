@@ -56,10 +56,10 @@ Module parse(Lexer tokens, string fn)
         default:
             decls ~= parseDecl();
             break;
-        };
+        }
         assert(lastt.text.ptr != t.text.ptr);
     }
-    fail();
+    //fail(); TODO(can't be reached)
 }
 
 /********************************************************/
@@ -90,7 +90,7 @@ Declaration parsePreprocessor()
             nextToken();
         }
         return new ImportDeclaration(fn);
-        break;
+        //break;
     case "define":
         nextToken();
         if (t.type != TOKid)
@@ -459,8 +459,11 @@ Expression parsePrimaryExpr()
         }
         return new IdentExpr(parseIdent());
     case TOKop:
-        if (t.text == "#")
+        if (t.text == "#") {
             goto case TOKid;
+		} else {
+			goto default;
+		}
     default:
         switch (t.text)
         {
@@ -656,7 +659,7 @@ Declaration parseDecl(Type tx = null, bool inExpr = false)
         } while (t.text != ")");
         exit(")");
         assert(0, "No macros!");
-        return new MacroCallDeclaration(id, args);
+        //return new MacroCallDeclaration(id, args); TODO(wtf)
     } else if (t.text == "typedef")
     {
         nextToken();
@@ -843,10 +846,11 @@ getid:
     if (t.text == ":")
     {
         assert(0, "No bitfields!");
-        nextToken();
+        /*nextToken(); TODO(are there no bitfields?)
         auto w = parseAssignExpr();
         check(";");
         return new BitfieldDeclaration(type, id, w);
+		*/
     }
     else if (t.text == "(")
     {
@@ -1328,9 +1332,10 @@ Statement parseStatement()
             if (t.text == "else")
                 selse = parseStatement();
             return new VersionStatement(cond, s, selse);
-        }
-        else
+        } else {
             fail();
+		}
+		goto case "#";
     case "#":
         return new ExpressionStatement(new DeclarationExpr(parseDecl(null, true)));
     case "__try":
