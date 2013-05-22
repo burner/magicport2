@@ -413,6 +413,8 @@ auto structTypes =
     "Id",
     "BaseClass",
     "ModuleDeclaration",
+	"OutBuffer",
+	"Object",
 
     "LINK",
     "PREC",
@@ -432,7 +434,7 @@ auto classTypes =
     "String",
     "FileName",
     "Bits",
-    "OutBuffer",
+    //"OutBuffer", this seams to be a struct
 
     "Section",
     "ParamSection",
@@ -474,7 +476,7 @@ auto classTypes =
     "ReturnStatements",
     "Files",
 
-    "Object",
+    //"Object", TODO(burner, seams to be a struct as well)
     "_Object",
     "Dsymbol",
     "DsymbolTable",

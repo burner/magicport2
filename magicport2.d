@@ -63,9 +63,15 @@ auto backsrc = [
     "backconfig.c"
 ];
 
+version(Windows) {
 enum frontpath = r"..\dmdgit\src\";
 enum rootpath = r"..\dmdgit\src\root\";
 enum backpath = frontpath ~ r"backend\";
+} else version(Posix) {
+enum frontpath = r"../dmdgit/src/";
+enum rootpath = r"../dmdgit/src/root/";
+enum backpath = frontpath ~ r"backend/";
+}
 
 void main()
 {

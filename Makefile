@@ -1,7 +1,7 @@
 
 SRC=magicport2.d ast.d scanner.d tokens.d parser.d printerast.d printercpp.d dprinter.d typenames.d visitor.d preprocess.d
 
-DFLAGS=-g -w -debug
+DFLAGS=-g -w -debug -debug=PARSE
 
 UNAME := $(shell uname)
 
@@ -22,7 +22,7 @@ else
 	port\dmd -g -J..\dmdgit -magicport port/dmd defs -d -ofport\dmdx.exe ..\dmdgit\src\glue.lib ..\dmdgit\src\backend.lib
 endif
 
-$(TARGET) : $(SRC)
+$(TARGET) : $(SRC) Makefile
 	dmd $(SRC) $(DFLAGS)
 
 clean:

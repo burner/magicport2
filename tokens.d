@@ -29,7 +29,7 @@ struct Token
 struct Lexer
 {
     string file;
-    size_t line;
+    size_t line = 1; // files start at line number one
     string t;
     Token current;
 

@@ -8,6 +8,18 @@ import std.stdio;
 import tokens;
 import ast;
 
+void trace(string parseFunction, int l = __LINE__, A...)(string msg, A a) {
+	debug(PARSE) {
+		writefln("%s:%d \"%s\":%d" ~ msg, parseFunction, l, t.text, t.line, a);
+	}
+}
+
+void trace(string parseFunction, int l = __LINE__)(string msg = "") {
+	debug(PARSE) {
+		writefln("%s:%d \"%s\":%d" ~ msg, parseFunction, l, t.text, t.line);
+	}
+}
+
 Lexer tx;
 Token t;
 string currentfile;
@@ -66,7 +78,8 @@ Module parse(Lexer tokens, string fn)
 
 Declaration parsePreprocessor()
 {
-    debug(PARSE) writeln("parsePreprocessor");
+    //debug(PARSE) writeln("parsePreprocessor");
+	trace!"parsePreprocessor"();
     check("#");
     if (t.type != TOKid)
         fail();
@@ -587,7 +600,10 @@ auto macroList =
 
 Declaration parseDecl(Type tx = null, bool inExpr = false)
 {
-    debug(PARSE) writeln("parseDecl");
+    /*debug(PARSE) writefln("parseDecl:%d \"%s\" at line %d",__LINE__, 
+		t.text, t.line);*/
+	trace!("parseDecl")();
+
     bool destructor;
     if (t.text == "template")
     {
@@ -597,7 +613,7 @@ Declaration parseDecl(Type tx = null, bool inExpr = false)
         check("TYPE");
         check(">");
         check("struct");
-        check("Array");
+        check("ArrayBase");		//TODO(burner, source says it is ArrayBase)
         check(";");
         return new DummyDeclaration("template<typename TYPE> struct Array;");
     }
@@ -605,17 +621,18 @@ Declaration parseDecl(Type tx = null, bool inExpr = false)
     {
         destructor = true;
         nextToken();
+		assert(t.text != "~");
         tx = new ClassType(t.text);
         goto getid;
-    } else if (t.text == "private" || t.text == "public")
-    {
+    } else if (t.text == "private" || t.text == "public") {
         auto p = nextToken();
         check(":");
         return new ProtDeclaration(p);
     } else if (t.text == "#")
     {
         return parsePreprocessor();
-    } else if ((t.text == "#if" || t.text == "#ifdef" || t.text == "#ifndef") && !inExpr)
+    } else if ((t.text == "#if" || t.text == "#ifdef" || t.text == "#ifndef") 
+			&& !inExpr)
     {
         auto ndef = (t.text == "#ifndef");
         auto def = (t.text == "#ifdef" || t.text == "#ifndef");
@@ -693,10 +710,13 @@ Declaration parseDecl(Type tx = null, bool inExpr = false)
             return new AnonStructDeclaration(kind, id, d);
         }
         auto id = parseIdent();
-        if (kind == "class")
-            assert(classTypes.canFind(id), "class " ~ id ~ " is not in the class types list");
-        else
-            assert(structTypes.canFind(id), kind ~ " " ~ id ~ " is not in the struct types list");
+        if (kind == "class") {
+            assert(classTypes.canFind(id), 
+				"class " ~ id ~ " is not in the class types list");
+		} else {
+            assert(structTypes.canFind(id), 
+				kind ~ " " ~ id ~ " is not in the struct types list");
+		}
         string s;
         if (t.text == ":")
         {
@@ -1056,7 +1076,9 @@ string parseIdent()
 
 Type parseType(string* id = null)
 {
-    debug(PARSE) writeln("parseType");
+    /*debug(PARSE) writefln("parseType:%d \"%s\" at line %d", __LINE__, 
+		t.text, t.line);*/
+	trace!("parseType")();
     bool isConst;
     if (t.text == "const")
     {
@@ -1125,7 +1147,9 @@ import typenames;
 
 Type parseBasicType(bool flag = false)
 {
-    debug(PARSE) writeln("parseBasicType");
+    //debug(PARSE) writefln("parseBasicType:%d \"%s\" at line %d", __LINE__, 
+		//t.text, t.line);
+	trace!("parseBasicType")();
     if (t.text == "unsigned" || t.text == "signed" || t.text == "volatile" || t.text == "long" || t.text == "_Complex")
     {
         auto id = parseIdent();
@@ -1250,7 +1274,8 @@ Statement parseCompoundStatement()
 
 Statement[] parseStatements()
 {
-    debug(PARSE) writeln("parseStatements");
+    //debug(PARSE) writefln("parseStatements \"%s\" at line %d", t.text, t.line);
+	trace!("parseStatements")();
     Statement[] s;
     while (t.text != "}")
         s ~= parseStatement();
@@ -1259,7 +1284,8 @@ Statement[] parseStatements()
 
 Statement parseStatement()
 {
-    debug(PARSE) writeln("parseStatement");
+    //debug(PARSE) writeln("parseStatement");
+	trace!("parseStatement")();
     switch (t.text)
     {
     case "{":
